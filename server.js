@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const expressLayouts = require('express-ejs-layouts');
@@ -5,7 +6,7 @@ const mongoose = require('mongoose');
 //require the index file
 const indexRouter = require('./routes/index')
 const router = require('./routes');
-require('dotenv').config();
+
 
 //open connection to database on locally running instance on mongodb
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true });
