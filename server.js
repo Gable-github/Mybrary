@@ -1,24 +1,27 @@
+//require this module only if in production and not deployment on heroku
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 };
+//require express module for easier connection and routing 
 const express = require('express');
+//create a "local" instance of express with 'app'
 const app = express();
 const expressLayouts = require('express-ejs-layouts');
+const bodyParser = require('body-parser');
+//require mogoose which makes connection and manipulation of DB far simpler
 const mongoose = require('mongoose');
 //require the index file
 const indexRouter = require('./routes/index')
-const router = require('./routes');
+const authorRouter = require('./routes/authors');
 
-
-//open connection to database on locally running instance on mongodb
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true });
-//check and catch any connection error to DB
 mongoose.connection.on('error', (error) => console.error(error));
 mongoose.connection.once('open', () => console.log('Connected to DB'));
 
-//set our view engine
+//setting view engine to EJS allows us to use static template HTML files in production
+//where they have access to JS variables with the help of EJS
 app.set('view engine', 'ejs');
-//set where (which folder) our views are coming from 
+//set which folder template files
 app.set('views', __dirname + '/views');
 //lastly, hook up express layouts
 //This express-ejs-layouts allows you to duplicate the header and footer section
@@ -28,9 +31,12 @@ app.set('layout', 'layouts/layout');
 //Use the expressLayouts middleware/module located in layouts/layout
 app.use(expressLayouts);
 app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: false}));
 
 //use indexRouter to handle incoming get requests at '/'
-//since indexRouter is a middleware, use app.use instead of app.get
+//app.use for using middleware
 app.use('/', indexRouter);
 
+app.use('/authors', authorRouter);
+ 
 app.listen( process.env.PORT || 3000);
