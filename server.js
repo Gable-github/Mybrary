@@ -12,7 +12,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 //require the index file
 const indexRouter = require('./routes/index')
-const authorRouter = require('./routes/authors');
+const authorRouter = require('./routes/authors')
+const bookRouter = require('./routes/books')
 
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.on('error', (error) => console.error(error));
@@ -38,5 +39,7 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: false}));
 app.use('/', indexRouter);
 
 app.use('/authors', authorRouter);
+
+app.use('/books', bookRouter);
  
 app.listen( process.env.PORT || 3000);

@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Author = require('../models/author');
-const { Mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 
 //All authors route
 router.get('/', async (req, res) => {
     let searchOptions = {};
-    if (req.query.name != null && req.query.name !== '') {
+    if (req.query.name !== null && req.query.name !== '') {
         searchOptions.name = new RegExp(req.query.name, 'i');
     }
     try {
