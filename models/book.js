@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const path = require('path')
 const coverImageBasePath = 'uploads/bookCovers'
 
 const bookSchema = mongoose.Schema({
@@ -31,6 +31,15 @@ const bookSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Author'
+    }
+})
+
+// virtual as we want to be able to use book.coverImagePath but we dont actually want to store that in the database as a proprty
+// when we call book.coverImagePath, it goes to get and the function within get()
+// get() tells book.coverImagePath to execute the function within
+bookSchema.virtual('coverImagePath').get(function() {
+    if(this.coverImageName) {
+        return path.join('/', coverImageBasePath, this.coverImageName)
     }
 })
 

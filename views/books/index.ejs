@@ -10,10 +10,9 @@
 
 <br>
 
-<% if (locals.book != null) { %>
-    <div><%= book %></div>
-<% } else { %> 
-<% authors.forEach(book => { %>
-    <div><%= book.title %> </div>
-<% }); %> 
-<% } %>
+<div>
+    <% books.forEach(book => { %>
+        <div><img height="150" width="100" src="<%= book.coverImagePath %>"></div>
+    <% }) %> 
+</div>
+
