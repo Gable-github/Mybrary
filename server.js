@@ -10,6 +10,7 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 //require mogoose which makes connection and manipulation of DB far simpler
 const mongoose = require('mongoose');
+const methodOverride = require('method-override')
 //require the index file
 const indexRouter = require('./routes/index')
 const authorRouter = require('./routes/authors')
@@ -33,6 +34,7 @@ app.set('layout', 'layouts/layout');
 app.use(expressLayouts);
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: false}));
+app.use(methodOverride('_method'))
 
 //use indexRouter to handle incoming get requests at '/'
 //app.use for using middleware
