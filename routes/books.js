@@ -2,19 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Book = require('../models/book.js')
 const Author = require('../models/author.js')
-const path = require('path')
-const uploadPath = path.join('public', Book.coverImageBasePath)
 const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif']
-const fs = require('fs')
-const multer = require('multer')
-const { render } = require('ejs')
-const upload = multer({
-    dest: uploadPath,
-    fileFilter: (req, file, callback) => {
-        // fileFilter callback takes null and a boolean
-        callback(null, imageMimeTypes.includes(file.mimetype))
-    }
-})
 
 router.get('/', async (req, res) => {
     let query = Book.find()
@@ -36,10 +24,9 @@ router.get('/new', async (req, res) => {
     renderNewPage(res, new Book())
 })
 
-router.post('/', upload.single('cover'), async (req, res) => {
+router.post('/', async (req, res) => {
     // If no file is present, fileName = null.
     // If file is present, fileName = req.file.filename = randomly generated filename
-    const fileName = req.file != null ? req.file.filename : null
     const book = new Book({
         title: req.body.title,
         author: req.body.author,
@@ -49,16 +36,14 @@ router.post('/', upload.single('cover'), async (req, res) => {
         // hence we need to change it back to a date format, which is what our model is expecting (publishdate: { type: Date })
         publishDate: new Date(req.body.publishDate),
         pageCount: req.body.pageCount,
-        coverImageName: fileName
     })
-   
+    // for uploading file into book model
+    saveCover(book, req.body.cover)
+    
     try {
         const newBook = await book.save()
         res.redirect(`books`)
     } catch {
-        if (book.coverImageName) {
-            removeBookCover(book.coverImageName)
-        }
         renderNewPage(res, book, true)
     }
 })
@@ -79,13 +64,17 @@ async function renderNewPage(res, book, hasError = false){
     }
 }
 
-function removeBookCover(fileName){
-    fs.unlink(path.join(uploadPath, fileName), 
-    err => {
-        if (err) {
-            console.error(err)
-        }
-    })
+// function to check if encoded data is present and then to save it
+function saveCover(book, coverEncoded) {
+    // if null then end process
+    if (!coverEncoded) return
+    // unencode the cover by changing it from a string to a JSON object
+    const cover = JSON.parse(coverEncoded)
+    // check if cover const is parsed correctly
+    if (cover && imageMimeTypes.includes(cover.type)) {
+        book.coverImage = new Buffer.from(cover.data, 'base64')
+        book.coverImageType = cover.type
+    }
 }
 
 module.exports = router

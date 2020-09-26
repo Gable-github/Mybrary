@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const path = require('path')
-const coverImageBasePath = 'uploads/bookCovers'
 
 const bookSchema = mongoose.Schema({
     title: {
@@ -23,9 +21,13 @@ const bookSchema = mongoose.Schema({
         required: true,
         default: Date.now
     },
-    coverImageName: {
-        type: String,
+    coverImage: {
+        type: Buffer,
         required: true,
+    },
+    coverImageType: {
+        type: String,
+        required: true
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
@@ -38,11 +40,9 @@ const bookSchema = mongoose.Schema({
 // when we call book.coverImagePath, it goes to get and the function within get()
 // get() tells book.coverImagePath to execute the function within
 bookSchema.virtual('coverImagePath').get(function() {
-    if(this.coverImageName) {
-        return path.join('/', coverImageBasePath, this.coverImageName)
+    if(this.coverImage && this.coverImageType) {
+        return `data:${this.coverImageType};charset=utf-8;base64,${this.coverImage.toString('base64')}`
     }
 })
 
 module.exports = mongoose.model('Books', bookSchema)
-
-module.exports.coverImageBasePath = coverImageBasePath
