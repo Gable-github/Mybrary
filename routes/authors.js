@@ -49,6 +49,10 @@ router.get('/:id', async (req, res) => {
     try {
         author = await Author.findById(req.params.id)
         books = await Book.find({ author: author.id }).sort({ createdAt: 'desc'}).limit(6).exec()
+        res.render(`authors/show`, {
+            author: author,
+            booksByAuthor: books
+        })
     } catch {
         if (!author) {
             res.render('/', {
@@ -57,10 +61,6 @@ router.get('/:id', async (req, res) => {
         }
         books = []
     }
-    res.render(`authors/show`, {
-        author: author,
-        booksByAuthor: books
-    })
 })
 
 router.get('/:id/edit', async (req, res) => {
@@ -101,6 +101,7 @@ router.delete('/:id', async (req, res) => {
         if (!author) {
             res.redirect('/')
         } else {
+            // redirect to above get() which renders show.ejs
             res.redirect(`/authors/${author.id}`)
         }
     }
