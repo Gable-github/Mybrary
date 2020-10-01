@@ -7,8 +7,9 @@ const Book = require('../models/book');
 //All authors route
 router.get('/', async (req, res) => {
     let searchOptions = {};
-    if (req.query.name !== null && req.query.name !== '') {
+    if (req.query.name) {
         searchOptions.name = new RegExp(req.query.name, 'i');
+        // RegExp issa constructor function. Object now becomes searchOptions
     }
     try {
         const authors = await Author.find(searchOptions);
