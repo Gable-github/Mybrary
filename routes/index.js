@@ -7,9 +7,6 @@ router.get('/', async (req, res) => {
     let displayText
     try {
         books = await Book.find().sort({ createdAt: 'desc'}).limit(10).exec()
-        if (books = []) {
-            displayText = "No recently added titles!"
-        }
     } catch {
         books = []
         displayText = "Something went wrong loading recent titles 🤔"
